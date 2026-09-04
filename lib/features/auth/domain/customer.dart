@@ -1,3 +1,5 @@
+import '../../../core/utils/json_parsing.dart';
+
 /// Maps to the `customers` table shape returned by
 /// CustomerApiController (register/login/profile).
 ///
@@ -16,12 +18,12 @@ class Customer {
 
   factory Customer.fromJson(Map<String, dynamic> json) {
     return Customer(
-      id: json['id'] as int,
+      id: parseInt(json['id']),
       email: json['email']?.toString() ?? '',
       fullName: (json['full_name'] ?? json['name'])?.toString(),
       phone: json['phone']?.toString(),
       country: json['country']?.toString(),
-      discount: double.tryParse(json['discount']?.toString() ?? '') ?? 0,
+      discount: parseDouble(json['discount']),
     );
   }
 

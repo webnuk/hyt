@@ -38,7 +38,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (!mounted) return;
 
     if (state.hasValue && state.value != null) {
-      context.go('/home');
+      if (context.canPop()) {
+        context.pop();
+      } else {
+        context.go('/');
+      }
     } else if (state.hasError) {
       final error = state.error;
       final message = error is ApiException ? (error.firstFieldError ?? error.message) : 'Login failed.';
@@ -121,7 +125,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       children: [
                         const Text("Don't have an account?"),
                         TextButton(
-                          onPressed: () => context.go('/register'),
+                          onPressed: () => context.push('/register'),
                           child: const Text('Sign Up'),
                         ),
                       ],

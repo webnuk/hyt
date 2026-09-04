@@ -6,7 +6,10 @@ import '../../../core/theme/app_theme.dart';
 import '../application/auth_controller.dart';
 
 /// Shown once at app start while [authControllerProvider] resolves whether a
-/// stored token is still valid, then routes to /home or /login.
+/// stored token is still valid. Browsing tours/hotels never requires
+/// sign-in, so this always lands on the main shell regardless of auth state
+/// — it only exists to avoid a flash of "signed out" UI before the token
+/// check (which the Account tab and booking buttons depend on) resolves.
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
@@ -20,9 +23,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   void _navigateIfReady(AsyncValue<dynamic> authState) {
     if (_navigated || authState.isLoading) return;
     _navigated = true;
-    final destination = authState.valueOrNull != null ? '/home' : '/login';
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) context.go(destination);
+      if (mounted) context.go('/');
     });
   }
 

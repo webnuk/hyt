@@ -41,7 +41,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (!mounted) return;
 
     if (state.hasValue && state.value != null) {
-      context.go('/home');
+      if (context.canPop()) {
+        context.pop();
+      } else {
+        context.go('/');
+      }
     } else if (state.hasError) {
       final error = state.error;
       final message = error is ApiException ? (error.firstFieldError ?? error.message) : 'Registration failed.';

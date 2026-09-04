@@ -1,4 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Required for all API calls (tours/hotels/auth/booking) — the debug-only
+         manifest also declares this (for Flutter tooling's hot reload channel),
+         but release/profile builds need it declared here too. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="host_your_tour"
         android:name="${applicationName}"
