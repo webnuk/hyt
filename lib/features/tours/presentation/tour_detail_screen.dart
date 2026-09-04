@@ -250,6 +250,13 @@ class _BookingBar extends ConsumerWidget {
             ),
             const SizedBox(width: 12),
             ElevatedButton(
+              // The app-wide ElevatedButtonTheme sets minimumSize to
+              // Size.fromHeight(52) — i.e. Size(double.infinity, 52) — for
+              // full-width form buttons (Login/Register). That infinite
+              // width crashes layout here since this button sits inline in
+              // a Row next to the price tag, not in a full-width container.
+              // Override with a bounded minimumSize to opt back out.
+              style: ElevatedButton.styleFrom(minimumSize: const Size(160, 52)),
               onPressed: () {
                 if (!isAuthenticated) {
                   context.push('/login');
