@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../shared/widgets/price_tag.dart';
 import '../../booking/domain/booking_target.dart';
 import '../application/hotel_providers.dart';
 import '../domain/hotel_detail.dart';
@@ -204,8 +203,6 @@ class _RoomTile extends StatelessWidget {
                       'Up to ${room.maxAdults} adults${room.maxChildren > 0 ? ', ${room.maxChildren} children' : ''}',
                       style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                     ),
-                    const SizedBox(height: 6),
-                    PriceTag(amount: room.pricePerNight, currencySymbol: room.currencySymbol, suffix: '/ night', size: 14),
                   ],
                 ),
               ),
@@ -238,7 +235,10 @@ class _BookingBar extends StatelessWidget {
         child: Row(
           children: [
             Expanded(
-              child: PriceTag(amount: hotel.minPrice, currencySymbol: hotel.currencySymbol, suffix: '/ night', size: 18),
+              child: Text(
+                'No payment taken here — the hotel confirms availability and rates after your enquiry.',
+                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+              ),
             ),
             const SizedBox(width: 12),
             ElevatedButton(

@@ -29,6 +29,7 @@ class _BookingEnquiryScreenState extends ConsumerState<BookingEnquiryScreen> {
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _messageController = TextEditingController();
+  final _dateController = TextEditingController();
   DateTime? _travelDate;
   bool _submitting = false;
   bool _sent = false;
@@ -50,17 +51,26 @@ class _BookingEnquiryScreenState extends ConsumerState<BookingEnquiryScreen> {
     _emailController.dispose();
     _phoneController.dispose();
     _messageController.dispose();
+    _dateController.dispose();
     super.dispose();
   }
 
   Future<void> _pickDate() async {
+    FocusScope.of(context).unfocus();
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
     final picked = await showDatePicker(
       context: context,
-      initialDate: _travelDate ?? DateTime.now().add(const Duration(days: 7)),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
+      initialDate: _travelDate ?? today.add(const Duration(days: 7)),
+      firstDate: today,
+      lastDate: today.add(const Duration(days: 365)),
     );
-    if (picked != null) setState(() => _travelDate = picked);
+    if (picked != null) {
+      setState(() {
+        _travelDate = picked;
+        _dateController.text = DateFormat('dd MMM yyyy').format(picked);
+      });
+    }
   }
 
   Future<void> _submit() async {
@@ -132,14 +142,22 @@ class _BookingEnquiryScreenState extends ConsumerState<BookingEnquiryScreen> {
               validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter a phone number' : null,
             ),
             const SizedBox(height: 14),
-            InkWell(
+            TextFormField(
+              controller: _dateController,
+              readOnly: true,
               onTap: _pickDate,
-              borderRadius: BorderRadius.circular(10),
-              child: InputDecorator(
-                decoration: const InputDecoration(labelText: 'Preferred travel date (optional)'),
-                child: Text(
-                  _travelDate == null ? 'Select a date' : DateFormat('dd MMM yyyy').format(_travelDate!),
-                ),
+              decoration: InputDecoration(
+                labelText: 'Preferred travel date (optional)',
+                hintText: 'Select a date',
+                suffixIcon: _travelDate == null
+                    ? const Icon(Icons.calendar_today)
+                    : IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () => setState(() {
+                          _travelDate = null;
+                          _dateController.clear();
+                        }),
+                      ),
               ),
             ),
             const SizedBox(height: 14),

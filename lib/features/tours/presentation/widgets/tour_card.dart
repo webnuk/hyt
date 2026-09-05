@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../shared/widgets/price_tag.dart';
 import '../../../../shared/widgets/rating_stars.dart';
 import '../../domain/tour_summary.dart';
 
@@ -64,8 +63,6 @@ class TourCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       RatingStars(rating: tour.averageRating, reviewsCount: tour.reviewsCount),
                     ],
-                    const SizedBox(height: 8),
-                    PriceTag(amount: tour.price, currencySymbol: tour.currencySymbol, suffix: '/ person'),
                   ],
                 ),
               ),

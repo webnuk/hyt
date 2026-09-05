@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
-import '../../../shared/widgets/price_tag.dart';
 import '../../../shared/widgets/rating_stars.dart';
 import '../../booking/domain/booking_target.dart';
 import '../application/tour_providers.dart';
@@ -244,7 +243,10 @@ class _BookingBar extends StatelessWidget {
         child: Row(
           children: [
             Expanded(
-              child: PriceTag(amount: tour.price, currencySymbol: tour.currencySymbol, suffix: '/ person', size: 18),
+              child: Text(
+                'No payment taken here — the operator confirms availability and price after your enquiry.',
+                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+              ),
             ),
             const SizedBox(width: 12),
             ElevatedButton(
