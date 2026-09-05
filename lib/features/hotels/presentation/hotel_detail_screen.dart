@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../shared/widgets/price_tag.dart';
-import '../../auth/application/auth_controller.dart';
+import '../../booking/domain/booking_target.dart';
 import '../application/hotel_providers.dart';
 import '../domain/hotel_detail.dart';
 
@@ -114,7 +114,7 @@ class _HotelDetailBody extends StatelessWidget {
                 if (hotel.rooms.isNotEmpty) ...[
                   Text('Rooms', style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: 10),
-                  ...hotel.rooms.map((room) => _RoomTile(room: room)),
+                  ...hotel.rooms.map((room) => _RoomTile(hotel: hotel, room: room)),
                 ],
 
                 if (hotel.cancellationPolicy?.isNotEmpty ?? false) ...[
@@ -152,59 +152,81 @@ class _TimeInfo extends StatelessWidget {
 }
 
 class _RoomTile extends StatelessWidget {
-  const _RoomTile({required this.room});
+  const _RoomTile({required this.hotel, required this.room});
+  final HotelDetail hotel;
   final HotelRoom room;
+
+  void _select(BuildContext context) {
+    context.push(
+      '/booking/enquiry',
+      extra: BookingTarget.hotel(
+        itemId: hotel.id,
+        slug: hotel.slug,
+        name: '${hotel.name} — ${room.name}',
+        image: room.image.isNotEmpty ? room.image : (hotel.images.isNotEmpty ? hotel.images.first : ''),
+        currencySymbol: room.currencySymbol,
+        roomId: room.id,
+        maxAdultsPerRoom: room.maxAdults,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
       clipBehavior: Clip.antiAlias,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: SizedBox(
-                width: 72,
-                height: 72,
-                child: room.image.isEmpty
-                    ? Container(color: Colors.grey.shade200)
-                    : CachedNetworkImage(imageUrl: room.image, fit: BoxFit.cover),
+      child: InkWell(
+        onTap: () => _select(context),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: SizedBox(
+                  width: 72,
+                  height: 72,
+                  child: room.image.isEmpty
+                      ? Container(color: Colors.grey.shade200)
+                      : CachedNetworkImage(imageUrl: room.image, fit: BoxFit.cover),
+                ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(room.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Up to ${room.maxAdults} adults${room.maxChildren > 0 ? ', ${room.maxChildren} children' : ''}',
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                  ),
-                  const SizedBox(height: 6),
-                  PriceTag(amount: room.pricePerNight, currencySymbol: room.currencySymbol, suffix: '/ night', size: 14),
-                ],
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(room.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Up to ${room.maxAdults} adults${room.maxChildren > 0 ? ', ${room.maxChildren} children' : ''}',
+                      style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                    ),
+                    const SizedBox(height: 6),
+                    PriceTag(amount: room.pricePerNight, currencySymbol: room.currencySymbol, suffix: '/ night', size: 14),
+                  ],
+                ),
               ),
-            ),
-          ],
+              const Icon(Icons.chevron_right, color: Colors.grey),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _BookingBar extends ConsumerWidget {
+class _BookingBar extends StatelessWidget {
   const _BookingBar({required this.hotel});
   final HotelDetail hotel;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final isAuthenticated = ref.watch(isAuthenticatedProvider);
+  Widget build(BuildContext context) {
+    final cheapestRoom = hotel.rooms.isEmpty
+        ? null
+        : hotel.rooms.reduce((a, b) => a.pricePerNight <= b.pricePerNight ? a : b);
 
     return SafeArea(
       child: Container(
@@ -227,16 +249,21 @@ class _BookingBar extends ConsumerWidget {
               // a Row next to the price tag, not in a full-width container.
               // Override with a bounded minimumSize to opt back out.
               style: ElevatedButton.styleFrom(minimumSize: const Size(160, 52)),
-              onPressed: () {
-                if (!isAuthenticated) {
-                  context.push('/login');
-                  return;
-                }
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Booking flow is coming soon — enquire via WhatsApp for now.')),
-                );
-              },
-              child: Text(isAuthenticated ? 'Book Now' : 'Sign In to Book'),
+              onPressed: cheapestRoom == null
+                  ? null
+                  : () => context.push(
+                        '/booking/enquiry',
+                        extra: BookingTarget.hotel(
+                          itemId: hotel.id,
+                          slug: hotel.slug,
+                          name: '${hotel.name} — ${cheapestRoom.name}',
+                          image: hotel.images.isNotEmpty ? hotel.images.first : '',
+                          currencySymbol: cheapestRoom.currencySymbol,
+                          roomId: cheapestRoom.id,
+                          maxAdultsPerRoom: cheapestRoom.maxAdults,
+                        ),
+                      ),
+              child: const Text('Book Now'),
             ),
           ],
         ),

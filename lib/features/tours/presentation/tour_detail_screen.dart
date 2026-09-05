@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../shared/widgets/price_tag.dart';
 import '../../../shared/widgets/rating_stars.dart';
-import '../../auth/application/auth_controller.dart';
+import '../../booking/domain/booking_target.dart';
 import '../application/tour_providers.dart';
 import '../domain/tour_detail.dart';
 import 'widgets/tour_card.dart';
@@ -228,14 +228,12 @@ class _ReviewTile extends StatelessWidget {
   }
 }
 
-class _BookingBar extends ConsumerWidget {
+class _BookingBar extends StatelessWidget {
   const _BookingBar({required this.tour});
   final TourDetail tour;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final isAuthenticated = ref.watch(isAuthenticatedProvider);
-
+  Widget build(BuildContext context) {
     return SafeArea(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -257,16 +255,18 @@ class _BookingBar extends ConsumerWidget {
               // a Row next to the price tag, not in a full-width container.
               // Override with a bounded minimumSize to opt back out.
               style: ElevatedButton.styleFrom(minimumSize: const Size(160, 52)),
-              onPressed: () {
-                if (!isAuthenticated) {
-                  context.push('/login');
-                  return;
-                }
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Booking flow is coming soon — enquire via WhatsApp for now.')),
-                );
-              },
-              child: Text(isAuthenticated ? 'Book Now' : 'Sign In to Book'),
+              onPressed: () => context.push(
+                '/booking/enquiry',
+                extra: BookingTarget.tour(
+                  itemId: tour.id,
+                  slug: tour.slug,
+                  name: tour.name,
+                  image: tour.featuredImage,
+                  currencySymbol: tour.currencySymbol,
+                  durationDays: tour.durationDays,
+                ),
+              ),
+              child: const Text('Book Now'),
             ),
           ],
         ),

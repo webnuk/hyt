@@ -2,6 +2,7 @@ import '../../../core/utils/json_parsing.dart';
 
 class HotelRoom {
   const HotelRoom({
+    required this.id,
     required this.name,
     required this.description,
     required this.pricePerNight,
@@ -12,6 +13,7 @@ class HotelRoom {
   });
 
   factory HotelRoom.fromJson(Map<String, dynamic> json) => HotelRoom(
+        id: parseInt(json['id']),
         name: json['name']?.toString() ?? 'Room',
         description: json['description']?.toString() ?? '',
         pricePerNight: parseDouble(json['pricePerNight']),
@@ -21,6 +23,7 @@ class HotelRoom {
         maxChildren: parseInt(json['maxChildren']),
       );
 
+  final int id;
   final String name;
   final String description;
   final double pricePerNight;

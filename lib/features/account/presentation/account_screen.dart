@@ -78,11 +78,7 @@ class _SignedInView extends ConsumerWidget {
           leading: const Icon(Icons.receipt_long_outlined),
           title: const Text('My Bookings'),
           trailing: const Icon(Icons.chevron_right),
-          onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Booking history is coming soon.')),
-            );
-          },
+          onTap: () => context.push('/account/bookings'),
         ),
         const Divider(),
         ListTile(
