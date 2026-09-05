@@ -4,7 +4,7 @@
          but release/profile builds need it declared here too. -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="host_your_tour"
+        android:label="Host Your Tour"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
